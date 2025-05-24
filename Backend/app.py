@@ -8,14 +8,12 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-# Cấu hình thư mục lưu ảnh
 UPLOAD_FOLDER = 'static/uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Cấu hình MySQL
 db = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -27,7 +25,6 @@ cursor = db.cursor(dictionary=True)
 
 @app.route('/students', methods=['GET'])
 def get_students():
-    cursor = db.cursor(dictionary=True)
     cursor.execute("""
         SELECT * FROM students 
         ORDER BY CAST(SUBSTRING(student_id, 3) AS UNSIGNED)
@@ -42,19 +39,15 @@ def get_students():
 @app.route("/students/search", methods=["GET"])
 def search_students():
     q = request.args.get('q', '')
-    query = """
+    like = f"%{q}%"
+    cursor.execute("""
         SELECT * FROM students
         WHERE student_id LIKE %s OR name LIKE %s OR room_number LIKE %s
-    """
-    like = f"%{q}%"
-    cursor.execute(query, (like, like, like))
+    """, (like, like, like))
     results = cursor.fetchall()
-
-    # 🔧 Định dạng lại ngày sinh
     for student in results:
         if student['birth_date']:
             student['birth_date'] = student['birth_date'].strftime('%d-%m-%Y')
-
     return jsonify(results)
 
 
@@ -65,52 +58,28 @@ def create_student():
     name = data['name']
     birth_date = data['birth_date']
     room_number = data['room_number']
-    image_data = data.get('image_base64')
+    images_data = data.get('images_base64', [])
 
-    image_path = None
-    if image_data:
-        filename = f"{student_id}_{int(datetime.now().timestamp())}.png"
+    image_paths = []
+    timestamp = int(datetime.now().timestamp())
+
+    for idx, image_data in enumerate(images_data):
+        filename = f"{student_id}_{timestamp}_{idx+1}.jpg"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         with open(filepath, "wb") as f:
             f.write(base64.b64decode(image_data.split(",")[1]))
-        image_path = filepath
+        image_paths.append(filepath)
+
+    main_image_path = image_paths[0] if image_paths else None
 
     query = """
         INSERT INTO students (student_id, name, birth_date, room_number, image_path)
         VALUES (%s, %s, %s, %s, %s)
     """
-    cursor.execute(
-        query, (student_id, name, birth_date, room_number, image_path))
+    cursor.execute(query, (student_id, name, birth_date,
+                   room_number, main_image_path))
     db.commit()
     return jsonify({"message": "Thêm sinh viên thành công"}), 201
-
-
-@app.route("/students/<int:id>", methods=["PUT"])
-def update_student(id):
-    data = request.json
-    student_id = data['student_id']
-    name = data['name']
-    birth_date = data['birth_date']
-    room_number = data['room_number']
-    image_data = data.get('image_base64')
-
-    image_path = None
-    if image_data:
-        filename = f"{student_id}_{int(datetime.now().timestamp())}.png"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        with open(filepath, "wb") as f:
-            f.write(base64.b64decode(image_data.split(",")[1]))
-        image_path = filepath
-
-    query = """
-        UPDATE students
-        SET student_id=%s, name=%s, birth_date=%s, room_number=%s, image_path=%s
-        WHERE id=%s
-    """
-    cursor.execute(query, (student_id, name, birth_date,
-                   room_number, image_path, id))
-    db.commit()
-    return jsonify({"message": "Cập nhật thành công"})
 
 
 @app.route("/students/<int:id>", methods=["DELETE"])

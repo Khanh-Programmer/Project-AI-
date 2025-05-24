@@ -5,52 +5,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Xác Thực Khuôn Mặt Sinh Viên</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../src/css/camera_style.css">
     <script src="../src/javascript/camera_script.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <header>
-            <h1>Hệ Thống Xác Thực Khuôn Mặt Sinh Viên KTX</h1>
-        </header>
+        <!-- Left Side - Camera Section -->
+        <div class="image-section">
+            <div class="circular-pattern"></div>
+            <div class="particles"></div>
+            <div class="image-overlay"></div>
 
-        <main class="app-layout">
-            <section class="webcam-section">
-                <h2>Camera</h2>
+            <div class="image-content">
+                <div class="header-content">
+                    <h1>Hệ Thống Xác Thực Khuôn Mặt Sinh Viên KTX</h1>
+                    <p>Giải pháp công nghệ hiện đại giúp xác thực danh tính sinh viên nhanh chóng, an toàn và chính xác.
+                    </p>
+                </div>
+
                 <div class="video-container">
                     <video id="webcamFeed" autoplay playsinline muted></video>
                     <div id="webcamOverlay" class="webcam-overlay">
+                        <div class="face-guide">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
                         <p>Vui lòng nhìn thẳng vào camera</p>
                     </div>
+                    <div class="scan-animation"></div>
+                    <div class="face-detection-box"></div>
                 </div>
-                <div class="controls">
-                    <button id="startButton">Bắt đầu quét</button>
-                    <button id="retryButton" class="hidden">Xác thực lại</button>
-                    <button id="supportButton">Yêu cầu hỗ trợ</button>
-                </div>
-            </section>
 
-            <section class="info-section">
-                <h2>Thông Tin Sinh Viên</h2>
-                <div id="statusMessage" class="status-message">
-                    <!-- Thông báo sẽ hiển thị ở đây -->
-                </div>
-                <div id="studentInfo" class="student-info hidden">
-                    <img id="studentAvatar" src="#" alt="Ảnh đại diện sinh viên">
-                    <div class="details">
-                        <p><strong>Họ và tên:</strong> <span id="studentName"></span></p>
-                        <p><strong>Mã số sinh viên:</strong> <span id="studentId"></span></p>
-                        <p><strong>Số phòng KTX:</strong> <span id="studentRoom"></span></p>
-                        <p><strong>Thời gian:</strong> <span id="accessTime"></span></p>
+                <div class="features-container">
+                    <div class="feature">
+                        <button id="startButton" class="feature-button">
+                            <i class="fas fa-camera"></i>
+                            <h3>Bắt đầu quét</h3>
+                        </button>
+                    </div>
+                    <div class="feature">
+                        <button id="supportButton" class="feature-button">
+                            <i class="fas fa-headset"></i>
+                            <h3>Yêu cầu hỗ trợ</h3>
+                        </button>
+                    </div>
+                    <div class="feature">
+                        <button id="homeButton" class="feature-button">
+                            <i class="fas fa-home"></i>
+                            <h3>Trang chủ</h3>
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Student Info Section -->
+        <div class="form-section">
+            <div class="logo-container">
+                <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="20" width="60" height="60" fill="#3a7bd5" rx="10" ry="10" />
+                    <rect x="35" y="30" width="30" height="40" fill="white" rx="5" ry="5" />
+                    <circle cx="50" cy="80" r="5" fill="white" />
+                </svg>
+                <div class="logo-text">DormManager</div>
+            </div>
+
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Thông Tin Sinh Viên</h2>
+                </div>
+
+                <div id="statusMessage" class="status-message error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Lỗi: Không thể truy cập webcam. Vui lòng kiểm tra quyền truy cập.</p>
+                </div>
+
+                <div id="studentInfo" class="student-info hidden">
+                    <div class="student-avatar">
+                        <img id="studentAvatar" src="#" alt="Ảnh đại diện sinh viên">
+                        <div class="verification-badge">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="student-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Họ và tên:</span>
+                                <span id="studentName" class="detail-value">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Mã số sinh viên:</span>
+                                <span id="studentId" class="detail-value">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Phòng KTX:</span>
+                                <span id="studentRoom" class="detail-value">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Thời gian:</span>
+                                <span id="accessTime" class="detail-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="verifyButton" class="login-button">
+                        <i class="fas fa-check-circle"></i> Xác nhận
+                    </button>
+                </div>
+
                 <div id="placeholderInfo" class="placeholder-info">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
                     <p>Thông tin sinh viên sẽ hiển thị tại đây sau khi xác thực thành công.</p>
                 </div>
-            </section>
-        </main>
-
+            </div>
+        </div>
     </div>
 </body>
 

@@ -111,7 +111,7 @@ function captureImage() {
         if (count >= totalCaptures) {
             clearInterval(captureInterval);
             document.getElementById("capturedImage").src = capturedImages[0]; // ảnh đại diện
-            alert("Đã chụp 20 ảnh trong 3 giây!");
+            alert("✅ Đã lưu ảnh thành công");
             return;
         }
 
@@ -137,7 +137,7 @@ async function saveStudent(e) {
     const room_number = document.getElementById("dormRoom").value;
 
     if (capturedImages.length < 20) {
-        alert("Vui lòng chụp đủ 20 ảnh trước khi lưu!");
+        alert("❌ Lưu thất bại ! Vui lòng xác thực khuôn mặt !");
         return;
     }
 
